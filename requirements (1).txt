@@ -1,0 +1,6 @@
+torch
+torchvision
+gradio
+opencv-python
+pandas
+matplotlib
