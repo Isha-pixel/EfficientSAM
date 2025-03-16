@@ -24,12 +24,27 @@ models['efficientsam_s'] = build_efficient_sam_vits()
 # models['squeeze_sam'] = build_squeeze_sam()
 
 # load an image
-sample_image_np = np.array(Image.open("figs/examples/dogs.jpg"))
+sample_image_np = np.array(Image.open("figs/examples/sunflower.jpg"))
 sample_image_tensor = transforms.ToTensor()(sample_image_np)
-# Feed a few (x,y) points in the mask as input.
 
-input_points = torch.tensor([[[[580, 350], [650, 350]]]])
-input_labels = torch.tensor([[[1, 1]]])
+# Feed a few (x,y) points in the mask as input.
+# shape: (batch, prompts, num_points)
+
+# 1. DOGS: 2 point prompts
+# input_points = torch.tensor([[[[580, 350], [650, 350]]]])
+# input_labels = torch.tensor([[[1, 1]]])
+
+# 2. PUG: 3 point prompts
+# input_points = torch.tensor([[[[1364, 1720], [1374,2696], [1080,3090]]]], dtype=torch.float)
+# input_labels = torch.tensor([[[1, 1, 1]]], dtype=torch.float)
+
+# 3. DUCK: 3 points (Ti was not working with 2 points, so we use 3 points.)
+input_points = torch.tensor([[[[610,238], [1134,445], [595,757]]]], dtype=torch.float)
+input_labels = torch.tensor([[[1, 1, 1]]], dtype=torch.float)
+
+# 4. SUNFLOWER: 4 point prompts
+# input_points = torch.tensor([[[[1601,1935], [1300,4188], [1334,5217], [3703,2546]]]], dtype=torch.float)
+# input_labels = torch.tensor([[[1, 1, 1, 1]]], dtype=torch.float)
 
 # Run inference for both EfficientSAM-Ti and EfficientSAM-S models.
 for model_name, model in models.items():
@@ -51,4 +66,4 @@ for model_name, model in models.items():
     # For this demo we use the first mask.
     mask = torch.ge(predicted_logits[0, 0, 0, :, :], 0).cpu().detach().numpy()
     masked_image_np = sample_image_np.copy().astype(np.uint8) * mask[:,:,None]
-    Image.fromarray(masked_image_np).save(f"figs/examples/dogs_{model_name}_mask.png")
+    Image.fromarray(masked_image_np).save(f"figs/examples/sunflower_{model_name}_mask.png")
